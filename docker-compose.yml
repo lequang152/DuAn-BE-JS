@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:13.2-alpine
+    container_name: odindb
+    hostname: db
+    ports:
+      - 5432:5432
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - POSTGRES_DB=mothaibabon
+      - POSTGRES_USER=bandinhlamgitoiday
+      - POSTGRES_PASSWORD=matkhauqualabaomat
+    restart: always
+    networks:
+      - app-network
+    volumes:
+      - ./db_odin/data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'odin', '-d', 'db_odin']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  api:
+    image: api:latest
+    container_name: api
+    hostname: api
+    ports:
+      - 3000:3000
+    networks:
+      - app-network
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+
+    volumes:
+      - ./api/.env/:/app/.env
+    restart: always
+    depends_on:
+      - db
+networks:
+  app-network:
+    external: true
+    name: app-network
+    driver: bridge
+
+volumes:
+  db_data:
